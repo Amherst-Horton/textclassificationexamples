@@ -1,12 +1,26 @@
 Package: textclassificationexamples
-Title: What the Package Does (One Line, Title Case)
+Type: Package
+Title: Example Datasets and Functions for Text Classification MEAs
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Authors@R: person("Leah", "Johnson", email = "lajohnson22@amherst.edu", 
+  role = a("aut", "cre")), person("Nicholas", "Horton", 
+  email = "nhorton@amherst.edu", role = "aut"))
+Description: This package contains example datasets for the  
+  classification of SPAM emails and clickbait headlines intended 
+  to familiarize students with unstructured text data. Through utilization 
+  of functions within the package, students are guided to consider 
+  which structural elements of their given text hold relevance, and make 
+  decisions on which of these elements will ultimately be used within 
+License: `use_mit_license()`
 Encoding: UTF-8
+Imports: 
+    dplyr,
+    stringr,
+    tidytext,
+    mosaic
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
