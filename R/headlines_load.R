@@ -63,4 +63,4 @@
 #'   \item{ids}{integer Original row number}
 #' }
 #' @source \url{https://github.com/bhargaviparanjape/clickbait}
-"sample_headlines"
+"headlines_sample"

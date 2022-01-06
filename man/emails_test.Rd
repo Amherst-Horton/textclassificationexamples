@@ -9,7 +9,7 @@ A data frame with 1,382 rows and 3 variables:
 \describe{
 \item{subjectline}{character Email subject line}
 \item{type}{character Email classification into three levels: spam, hard_ham, and easy_ham}
-\item{ids}{integer Row number}
+\item{ids}{integer Original row number}
 }
 }
 \source{
