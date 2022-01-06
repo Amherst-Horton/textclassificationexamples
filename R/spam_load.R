@@ -24,7 +24,7 @@
 #' \describe{
 #'   \item{subjectline}{character Email subject line}
 #'   \item{type}{character Email classification into three levels: spam, hard_ham, and easy_ham}
-#'   \item{ids}{integer Row number}
+#'   \item{ids}{integer Original row number}
 #' }
 #' @source \url{http://www.rdatasciencecases.org/Spam}
 "emails_train"
@@ -37,7 +37,7 @@
 #' \describe{
 #'   \item{subjectline}{character Email subject line}
 #'   \item{type}{character Email classification into three levels: spam, hard_ham, and easy_ham}
-#'   \item{ids}{integer Row number}
+#'   \item{ids}{integer Original row number}
 #' }
 #' @source \url{http://www.rdatasciencecases.org/Spam}
 "emails_test"
