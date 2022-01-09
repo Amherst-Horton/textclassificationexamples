@@ -15,7 +15,9 @@ whether or not there is a dollar sign. This function is intended for use
 on any of the email MEA datasets.
 }
 \examples{
+\dontrun{
 emails_dollar <- emails \%>\%
    mutate(has_dollar_sign = has_dollar_sign(text = subjectline))
+}
 
 }

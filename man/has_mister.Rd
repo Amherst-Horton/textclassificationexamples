@@ -15,7 +15,9 @@ whether or not the word "Mister" or "Mr" appears within it. This function
 is intended for use on any of the email MEA datasets.
 }
 \examples{
+\dontrun{
 emails_mister <- emails \%>\%
    mutate(has_mister = has_mister(text = subjectline))
+}
 
 }
