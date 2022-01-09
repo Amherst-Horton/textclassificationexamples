@@ -10,8 +10,8 @@ Description: This package contains example datasets for the classification of SP
 License: GPL (>=2)
 Encoding: UTF-8
 Imports: 
-    dplyr,
-    stringr,
+    tidyverse, 
+    textdata
     tidytext,
     mosaic
 Roxygen: list(markdown = TRUE)
