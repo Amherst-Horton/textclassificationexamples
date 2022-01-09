@@ -38,7 +38,7 @@ has_common_phrase <- function(text){
 #' @export
 
 has_exaggerated_phrase <- function(text) {
-  str_detect(text, paste(exxagerated$phrase, collapse = "|")) 
+  str_detect(text, paste(exaggerated$phrase, collapse = "|")) 
 }
 
 #' Question Words
