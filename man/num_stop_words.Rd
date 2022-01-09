@@ -15,7 +15,9 @@ the number of stop words present.
 This function is intended for use on any of the clickbait MEA datasets.
 }
 \examples{
+\dontrun{
 headlines_stop_words <- headlines \%>\%
    mutate(num_stop_words = num_stop_words(text = title))
+}
 
 }

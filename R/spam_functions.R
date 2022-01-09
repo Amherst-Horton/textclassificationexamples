@@ -1,5 +1,3 @@
-library(tidyverse)
-
 #' All Caps
 #'
 #' This function takes in any string and returns a boolean indicating
@@ -8,9 +6,13 @@ library(tidyverse)
 #'
 #' @param text string/ email subject line
 #'
+#' @importFrom stringr str_detect
+#'
 #' @examples
+#' \dontrun{
 #' emails_caps <- emails %>%
 #'    mutate(all_caps = all_caps(text = subjectline))
+#' }
 #'
 #' @export
 
@@ -26,9 +28,13 @@ all_caps <- function(text) {
 #'
 #' @param text string/ email subject line
 #'
+#' @importFrom stringr str_detect
+#' 
 #' @examples
+#' \dontrun{
 #' emails_dollar <- emails %>%
 #'    mutate(has_dollar_sign = has_dollar_sign(text = subjectline))
+#' }
 #'
 #' @export
 
@@ -44,9 +50,13 @@ has_dollar_sign <- function(text) {
 #'
 #' @param text string/ email subject line
 #'
+#' @importFrom stringr str_detect
+#' 
 #' @examples
+#' \dontrun{
 #' emails_dear <- emails %>%
 #'    mutate(has_dear = has_dear(text = subjectline))
+#' }
 #'
 #' @export
 
@@ -62,9 +72,13 @@ has_dear <- function(text) {
 #'
 #' @param text string/ email subject line
 #'
+#' @importFrom stringr str_detect
+#' 
 #' @examples
+#' \dontrun{
 #' emails_mister <- emails %>%
 #'    mutate(has_mister = has_mister(text = subjectline))
+#' }
 #'
 #' @export
 
@@ -80,10 +94,14 @@ has_mister <- function(text) {
 #'
 #' @param text string/ email subject line
 #'
+#' @importFrom stringr str_detect
+#' 
 #' @examples
+#' \dontrun{
 #' emails_punctuation <- emails %>%
 #'    mutate(multiple_punctuation =
 #'           multiple_punctuation(text = subjectline))
+#' }
 #'
 #' @export
 
@@ -99,9 +117,13 @@ multiple_punctuation <- function(text) {
 #'
 #' @param text string/ email subject line
 #'
+#' @importFrom stringr str_detect
+#' 
 #' @examples
+#' \dontrun{
 #' emails_religious <- emails %>%
 #'    mutate(has_religious = has_religious(text = subjectline))
+#' }
 #'
 #' @export
 

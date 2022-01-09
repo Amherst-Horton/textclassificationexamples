@@ -16,7 +16,9 @@ is present. This function is intended for use on any of the clickbait
 MEA datasets.
 }
 \examples{
+\dontrun{
 headlines_common <- headlines \%>\%
    mutate(has_common_phrase = has_common_phrase(text = title))
+}
 
 }

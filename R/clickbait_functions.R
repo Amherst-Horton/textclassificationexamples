@@ -1,7 +1,3 @@
-library(tidyverse)
-library(tidytext)
-library(textdata)
-
 #' Common Phrases
 #'
 #' This function takes in any string and returns a boolean indicating
@@ -11,9 +7,13 @@ library(textdata)
 #'
 #' @param text string/ headline
 #'
+#' @importFrom stringr str_detect
+#'
 #' @examples
+#' \dontrun{
 #' headlines_common <- headlines %>%
 #'    mutate(has_common_phrase = has_common_phrase(text = title))
+#' }
 #'
 #' @export
 
@@ -30,10 +30,14 @@ has_common_phrase <- function(text){
 #'
 #' @param text string/ headline
 #'
+#' @importFrom stringr str_detect
+#'
 #' @examples
+#' \dontrun{
 #' headlines_exaggerated <- headlines %>%
 #'    mutate(has_exaggerated_phrase =
 #'           has_exaggerated_phrase(text = title))
+#' }
 #'
 #' @export
 
@@ -50,9 +54,13 @@ has_exaggerated_phrase <- function(text) {
 #'
 #' @param text string/ headline
 #'
+#' @importFrom stringr str_detect
+#'
 #' @examples
+#' \dontrun{
 #' headlines_question <- headlines %>%
 #'    mutate(has_question_word = has_question_word(text = title))
+#' }
 #'
 #' @export
 
@@ -68,9 +76,13 @@ has_question_word <- function(text) {
 #'
 #' @param text string/ headline
 #'
+#' @importFrom stringr str_count
+#'
 #' @examples
+#' \dontrun{
 #' headlines_contractions <- headlines %>%
 #'    mutate(num_contractions = num_contractions(text = title))
+#' }
 #'
 #' @export
 
@@ -86,9 +98,15 @@ num_contractions <- function(text){
 #'
 #' @param text string/ headline
 #'
+#' @import textdata
+#' @importFrom stringr str_count
+#' @importFrom utils data 
+#'
 #' @examples
+#' \dontrun{
 #' headlines_stop_words <- headlines %>%
 #'    mutate(num_stop_words = num_stop_words(text = title))
+#' }
 #'
 #' @export
 
@@ -105,9 +123,13 @@ num_stop_words <- function(text){
 #'
 #' @param text string/ headline
 #'
+#' @importFrom stringr str_detect
+#' 
 #' @examples
+#' \dontrun{
 #' articles_starts_num <- headlines %>%
 #'    mutate(starts_with_num = starts_with_num(text = title))
+#' }
 #'
 #' @export
 
@@ -122,8 +144,12 @@ starts_with_num <- function(text){
 #'
 #' @param text string/ headline
 #'
+#' @importFrom stringr str_count
+#'
 #' @examples
+#' \dontrun{
 #' headlines_words <- headlines %>% mutate(num_words = num_words(title))
+#' }
 #'
 #' @export
 
@@ -141,9 +167,13 @@ num_words <- function(text){
 #'
 #' @param text string/ headline
 #'
+#' @importFrom stringr str_count
+#'
 #' @examples
+#' \dontrun{
 #' headlines_pronouns <- headlines %>%
 #'    mutate(num_pronouns = num_pronouns(text = title))
+#' }
 #'
 #' @export
 #'
@@ -167,8 +197,15 @@ num_pronouns <- function(text){
 #'
 #' @param ds dataset
 #'
+#' @importFrom stringr str_trim
+#' @importFrom stringr str_split 
+#' @importFrom tidytext get_sentiments
+#' @importFrom dplyr filter 
+#'
 #' @examples
+#' \dontrun{
 #' articles_positivity <- positivity(articles)
+#' }
 #'
 #' @export
 #'

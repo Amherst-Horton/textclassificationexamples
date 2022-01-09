@@ -15,7 +15,9 @@ whether or not the word "dear" appears within it. This function is
 intended for use on any of the email MEA datasets.
 }
 \examples{
+\dontrun{
 emails_dear <- emails \%>\%
    mutate(has_dear = has_dear(text = subjectline))
+}
 
 }

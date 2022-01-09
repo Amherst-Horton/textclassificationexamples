@@ -16,8 +16,10 @@ present. This function is intended for use on any of the clickbait
 MEA datasets.
 }
 \examples{
+\dontrun{
 headlines_exaggerated <- headlines \%>\%
    mutate(has_exaggerated_phrase =
           has_exaggerated_phrase(text = title))
+}
 
 }

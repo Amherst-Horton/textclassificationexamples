@@ -17,7 +17,9 @@ Pronouns detected include: I, me, you, he, him, she, her, it, we,
 us, they, them, one, your, and my.
 }
 \examples{
+\dontrun{
 headlines_pronouns <- headlines \%>\%
    mutate(num_pronouns = num_pronouns(text = title))
+}
 
 }

@@ -15,7 +15,9 @@ whether or not it begins with a number. This function is intended for
 use on any of the clickbait MEA datasets.
 }
 \examples{
+\dontrun{
 articles_starts_num <- headlines \%>\%
    mutate(starts_with_num = starts_with_num(text = title))
+}
 
 }

@@ -15,8 +15,10 @@ whether or not multiple punctuation marks are present. This function is
 intended for use on any of the email MEA datasets.
 }
 \examples{
+\dontrun{
 emails_punctuation <- emails \%>\%
    mutate(multiple_punctuation =
           multiple_punctuation(text = subjectline))
+}
 
 }

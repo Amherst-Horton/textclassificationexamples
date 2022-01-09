@@ -15,7 +15,9 @@ whether or not religious words are present. This function is
 intended for use on any of the email MEA datasets.
 }
 \examples{
+\dontrun{
 emails_religious <- emails \%>\%
    mutate(has_religious = has_religious(text = subjectline))
+}
 
 }

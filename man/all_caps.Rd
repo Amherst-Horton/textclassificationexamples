@@ -15,7 +15,9 @@ whether or not it is in all caps. This function is intended for use
 on any of the email MEA datasets.
 }
 \examples{
+\dontrun{
 emails_caps <- emails \%>\%
    mutate(all_caps = all_caps(text = subjectline))
+}
 
 }

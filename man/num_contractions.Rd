@@ -15,7 +15,9 @@ present.
 This function is intended for use on any of the clickbait MEA datasets.
 }
 \examples{
+\dontrun{
 headlines_contractions <- headlines \%>\%
    mutate(num_contractions = num_contractions(text = title))
+}
 
 }

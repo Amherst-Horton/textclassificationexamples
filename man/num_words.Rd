@@ -14,6 +14,8 @@ This function takes in any string and returns the number of words it has.
 This function is intended for use on any of the clickbait MEA datasets.
 }
 \examples{
+\dontrun{
 headlines_words <- headlines \%>\% mutate(num_words = num_words(title))
+}
 
 }

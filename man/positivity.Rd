@@ -17,6 +17,8 @@ each headline. Scores of 0 represent neutral headlines, or headlines
 not containing any words within the AFINN wordbank.
 }
 \examples{
+\dontrun{
 articles_positivity <- positivity(articles)
+}
 
 }

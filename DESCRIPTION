@@ -10,7 +10,10 @@ Description: This package contains example datasets for the classification of SP
 License: GPL (>=2)
 Encoding: UTF-8
 Imports: 
-    tidyverse, 
+    magrittr, 
+    R.utils,
+    dplyr, 
+    stringr, 
     textdata,
     tidytext,
     mosaic
