@@ -1,3 +1,5 @@
+library(tidytext)
+
 #' Common Phrases
 #'
 #' This function takes in any string and returns a boolean indicating
@@ -98,7 +100,6 @@ num_contractions <- function(text){
 #'
 #' @param text string/ headline
 #'
-#' @import textdata
 #' @importFrom stringr str_count
 #' @importFrom utils data 
 #'
