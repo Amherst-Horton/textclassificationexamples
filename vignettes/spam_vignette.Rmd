@@ -1,0 +1,149 @@
+---
+title: "spam_vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{spam_vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(tidymodels)
+library(tidyverse)
+library(bestglm)
+library(textclassificationexamples)
+```
+
+# Simple Logistic Regression 
+
+> Not much increase in accuracy from null model 
+
+```{r}
+# CREATE FEATURES ------------------------------------------------------------------------
+data(emails_train)
+data(emails_test)
+
+spam_train <- emails_train |>
+  na.omit() |>
+  mutate(
+    type = as.factor(ifelse(type %in% c("spam"), "spam", "not_spam")),
+    caps = as.factor(all_caps(subjectline)), 
+    dollar_sign = as.factor(has_dollar_sign(subjectline)), 
+    dear = as.factor(has_dear(subjectline)),
+    #mister = as.factor(has_mister(subjectline)),
+    punctuation = as.factor(multiple_punctuation(subjectline)),
+    religious = as.factor(has_religious(subjectline))
+  ) |>
+  select(-c(ids, subjectline))
+
+spam_test <- emails_test |>
+  na.omit() |>
+  mutate(
+    type = as.factor(ifelse(type %in% c("spam"), "spam", "not_spam")),
+    caps = as.factor(all_caps(subjectline)), 
+    dollar_sign = as.factor(has_dollar_sign(subjectline)), 
+    dear = as.factor(has_dear(subjectline)),
+    #mister = as.factor(has_mister(subjectline)),
+    punctuation = as.factor(multiple_punctuation(subjectline)),
+    religious = as.factor(has_religious(subjectline))
+  ) |>
+  select(-c(ids, subjectline))
+
+# NULL MODEL -----------------------------------------------------------------------------
+
+table(spam_train$type)
+
+mean(spam_train$type == "not_spam")
+```
+
+```{r}
+# MODEL SELECTION ------------------------------------------------------------------------
+
+full_model <- glm(
+  type ~ ., 
+  data = spam_train, 
+  family = binomial
+  )
+
+MASS::stepAIC(full_model, direction = "backward")
+
+# LOGISTIC REGRESSION --------------------------------------------------------------------
+
+simple_logistic_model<- logistic_reg() %>%
+        set_engine("glm") %>%
+        set_mode("classification") %>%
+        fit(type ~ caps + dollar_sign + punctuation + religious, data = spam_train)
+
+tidy(simple_logistic_model)  
+
+# PREDICTION and METRICS -----------------------------------------------------------------
+
+pred_class <- predict(
+  simple_logistic_model, 
+  new_data = spam_test, 
+  type = "class"
+)
+
+pred_prob <- predict(
+  simple_logistic_model, 
+  new_data = spam_test, 
+  type = "prob"
+)
+
+spam_results <- spam_test |>
+  select(type) |>
+  bind_cols(pred_class, pred_prob)
+
+confusion_matrix <- yardstick::conf_mat(
+  spam_results, truth = type, estimate = .pred_class
+  )
+
+confusion_matrix
+
+accuracy <- yardstick::accuracy(
+  spam_results, truth = type, estimate = .pred_class
+  )
+
+sensitivity <- yardstick::sens(
+  spam_results, truth = type, estimate = .pred_class
+)
+
+specificity <- yardstick::spec(
+  spam_results, truth = type, estimate = .pred_class
+)
+
+yardstick::roc_curve(
+  spam_results, truth = type, estimate = .pred_not_spam
+) |>
+  autoplot()
+```
+
+# Decision Tree 
+
+```{r}
+dec_tree <- decision_tree(tree_depth = 10) |>
+  set_engine("rpart") |>
+  set_mode("classification") |> 
+  fit(type ~ ., data = spam_train)
+
+rpart.plot::rpart.plot(dec_tree$fit)
+```
+
+```{r}
+# training accuracy 
+
+augment(dec_tree, new_data = spam_train) |> 
+  accuracy(truth = type, estimate = .pred_class)
+
+# testing accuracy 
+
+augment(dec_tree, new_data = spam_test) |> 
+  accuracy(truth = type, estimate = .pred_class)
+```

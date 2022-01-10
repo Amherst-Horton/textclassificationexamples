@@ -19,6 +19,7 @@ Imports:
     tidymodels,
     rpart.plot,
     bestglm, 
+    MASS, 
     mosaic
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
