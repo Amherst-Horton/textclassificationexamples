@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(tidymodels)
 library(tidyverse)
+library(bestglm)
 library(textclassificationexamples)
 ```
 
@@ -28,32 +29,34 @@ data(headlines_train)
 # CREATE FEATURES ------------------------------------------------------------------------
 
 clickbait_train <- headlines_train |>
+  na.omit() |>
   mutate(
     clickbait = as.factor(clickbait),
-    common = has_common_phrase(title),
-    exaggerated = has_exaggerated_phrase(title), 
+    common = as.factor(has_common_phrase(title)),
+    exaggerated = as.factor(has_exaggerated_phrase(title)), 
     num_contractions = num_contractions(title),
     #num_stop_words = num_stop_words(title),
     num_words = num_words(title),
     num_pronouns = num_pronouns(title),
-    positivity = positivity(title),
-    starts_num = starts_with_num(title), 
-    question = has_question_word(title)
+    #positivity = positivity(title),
+    starts_num = as.factor(starts_with_num(title)), 
+    question = as.factor(has_question_word(title))
   ) |>
   select(-c(ids, title))
 
 clickbait_test <- headlines_test |>
+  na.omit() |>
   mutate(
     clickbait = as.factor(clickbait),
-    common = has_common_phrase(title),
-    exaggerated = has_exaggerated_phrase(title), 
+    common = as.factor(has_common_phrase(title)),
+    exaggerated = as.factor(has_exaggerated_phrase(title)), 
     num_contractions = num_contractions(title),
     #num_stop_words = num_stop_words(title),
     num_words = num_words(title),
     num_pronouns = num_pronouns(title),
-    positivity = positivity(title),
-    starts_num = starts_with_num(title), 
-    question = has_question_word(title)
+    #positivity = positivity(title),
+    starts_num = as.factor(starts_with_num(title)), 
+    question = as.factor(has_question_word(title))
   ) |>
   select(-c(ids, title))
 
@@ -62,18 +65,31 @@ clickbait_test <- headlines_test |>
 table(clickbait_train$clickbait)
 
 mean(clickbait_train$clickbait == "FALSE")
+```
+
+```{r}
+# MODEL SELECTION ------------------------------------------------------------------------
+
+full_model <- glm(
+  clickbait ~ common + exaggerated + num_contractions + num_words + num_pronouns + 
+    starts_num + question, 
+  data = clickbait_train, 
+  family = binomial
+  )
+
+MASS::stepAIC(full_model, direction = "backward")
 
 # LOGISTIC REGRESSION --------------------------------------------------------------------
 
 simple_logistic_model<- logistic_reg() %>%
         set_engine("glm") %>%
         set_mode("classification") %>%
-        fit(clickbait ~ question + starts_num, data = clickbait_train)
+        fit(clickbait ~ ., data = clickbait_train)
 
 tidy(simple_logistic_model)  
-```
 
-```{r}
+# PREDICTION and METRICS -----------------------------------------------------------------
+
 pred_class <- predict(
   simple_logistic_model, 
   new_data = clickbait_test, 
@@ -120,9 +136,9 @@ yardstick::roc_curve(
 dec_tree <- decision_tree(tree_depth = 10) |>
   set_engine("rpart") |>
   set_mode("classification") |> 
-  fit(clickbait ~ starts_num + num_words + common, data = clickbait_train)
+  fit(clickbait ~ ., data = clickbait_train)
 
-rpart.plot::rpart.plot(dec_tree$fit, roundint = FALSE)
+rpart.plot::rpart.plot(dec_tree$fit)
 ```
 
 ```{r}
