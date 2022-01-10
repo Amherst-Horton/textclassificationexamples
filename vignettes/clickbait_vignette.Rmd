@@ -117,7 +117,24 @@ yardstick::roc_curve(
 # Decision Tree 
 
 ```{r}
+dec_tree <- decision_tree(tree_depth = 10) |>
+  set_engine("rpart") |>
+  set_mode("classification") |> 
+  fit(clickbait ~ starts_num + num_words + common, data = clickbait_train)
 
+rpart.plot::rpart.plot(dec_tree$fit, roundint = FALSE)
+```
+
+```{r}
+# training accuracy 
+
+augment(dec_tree, new_data = clickbait_train) |> 
+  accuracy(truth = clickbait, estimate = .pred_class)
+
+# testing accuracy 
+
+augment(dec_tree, new_data = clickbait_test) |> 
+  accuracy(truth = clickbait, estimate = .pred_class)
 ```
 
 
