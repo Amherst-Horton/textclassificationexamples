@@ -25,6 +25,7 @@ library(textclassificationexamples)
 
 ```{r}
 data(headlines_train)
+data(headlines_test)
 
 # CREATE FEATURES ------------------------------------------------------------------------
 
