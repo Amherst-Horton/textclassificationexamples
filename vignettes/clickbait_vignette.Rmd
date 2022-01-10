@@ -1,0 +1,124 @@
+---
+title: "clickbait_vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Clickbait Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(tidymodels)
+library(tidyverse)
+library(textclassificationexamples)
+```
+
+# Simple Logistic Regression 
+
+```{r}
+data(headlines_train)
+
+# CREATE FEATURES ------------------------------------------------------------------------
+
+clickbait_train <- headlines_train |>
+  mutate(
+    clickbait = as.factor(clickbait),
+    common = has_common_phrase(title),
+    exaggerated = has_exaggerated_phrase(title), 
+    num_contractions = num_contractions(title),
+    #num_stop_words = num_stop_words(title),
+    num_words = num_words(title),
+    num_pronouns = num_pronouns(title),
+    positivity = positivity(title),
+    starts_num = starts_with_num(title), 
+    question = has_question_word(title)
+  ) |>
+  select(-c(ids, title))
+
+clickbait_test <- headlines_test |>
+  mutate(
+    clickbait = as.factor(clickbait),
+    common = has_common_phrase(title),
+    exaggerated = has_exaggerated_phrase(title), 
+    num_contractions = num_contractions(title),
+    #num_stop_words = num_stop_words(title),
+    num_words = num_words(title),
+    num_pronouns = num_pronouns(title),
+    positivity = positivity(title),
+    starts_num = starts_with_num(title), 
+    question = has_question_word(title)
+  ) |>
+  select(-c(ids, title))
+
+# NULL MODEL -----------------------------------------------------------------------------
+
+table(clickbait_train$clickbait)
+
+mean(clickbait_train$clickbait == "FALSE")
+
+# LOGISTIC REGRESSION --------------------------------------------------------------------
+
+simple_logistic_model<- logistic_reg() %>%
+        set_engine("glm") %>%
+        set_mode("classification") %>%
+        fit(clickbait ~ question + starts_num, data = clickbait_train)
+
+tidy(simple_logistic_model)  
+```
+
+```{r}
+pred_class <- predict(
+  simple_logistic_model, 
+  new_data = clickbait_test, 
+  type = "class"
+)
+
+pred_prob <- predict(
+  simple_logistic_model, 
+  new_data = clickbait_test, 
+  type = "prob"
+)
+
+clickbait_results <- clickbait_test |>
+  select(clickbait) |>
+  bind_cols(pred_class, pred_prob)
+
+confusion_matrix <- yardstick::conf_mat(
+  clickbait_results, truth = clickbait, estimate = .pred_class
+  )
+
+confusion_matrix
+
+accuracy <- yardstick::accuracy(
+  clickbait_results, truth = clickbait, estimate = .pred_class
+  )
+
+sensitivity <- yardstick::sens(
+  clickbait_results, truth = clickbait, estimate = .pred_class
+)
+
+specificity <- yardstick::spec(
+  clickbait_results, truth = clickbait, estimate = .pred_class
+)
+
+yardstick::roc_curve(
+  clickbait_results, truth = clickbait, estimate = .pred_TRUE
+) |>
+  autoplot()
+```
+
+# Decision Tree 
+
+```{r}
+
+```
+
+
+
