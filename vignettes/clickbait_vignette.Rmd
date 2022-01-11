@@ -1,5 +1,5 @@
 ---
-title: "clickbait_vignette"
+title: "Clickbait Analysis"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Clickbait Analysis}
@@ -10,23 +10,63 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
-)
+  comment = NA
+    )
 ```
 
 ```{r setup}
 library(tidymodels)
 library(tidyverse)
 library(bestglm)
+library(scales)
 library(textclassificationexamples)
 ```
 
-# Simple Logistic Regression 
+# Clickbait Classification 
 
-```{r}
+The `textclassificationexamples` package contains the data set `headlines` that consists of three variables: 
+
+- `ids`: An integer indicating row ID
+- `title`: A character variable containing the article headline 
+- `clickbait`: a logical variable that takes the value TRUE if the article is clickbait, and FALSE if the article is not clickbait
+
+This data has already been split into training (`headline_train`) and test (`headline_test`) data, with the training data consisting of about 80% of observations, and the test data the remaining 20%.
+
+Through this vignette, we'll use these data sets along with the helper functions from the `textclassificationexamples` package in order to classify articles as clickbait or not. 
+
+First, we'll load the data so it's available to work with. 
+
+```{r data-load}
+# LOAD DATA ------------------------------------------------------------------------------
+
 data(headlines_train)
 data(headlines_test)
+```
 
+Now both `headlines_train` and `headlines_test` are available as objects in our environment. 
+
+## Feature Creation 
+
+In order to classify the headlines, we'll have to come up with certain features or explanatory variables that might contribute to whether or not a headline is clickbait. 
+
+A few functions available in the `textclassificationexamples` package help to facilitate the creation of some such predetermined features 
+
+These include: 
+
+- `has_common_phrase()`: Takes a character string and returns a logical - TRUE if the string contains a common phrase, and FALSE if it does not. 
+- `has_exaggerated_phrase()`: Takes a character string and returns a logical - TRUE if the string contains an exaggerated phrase, and FALSE if it does not. 
+- `num_contractions()`: Takes a character string and returns an integer - the number of contractions contained in the string. 
+- `num_stop_words()`: Takes a character string and returns an integer - the number of stop words contained in the string. 
+- `num_pronouns()`: Takes a character string and returns an integer - the number of pronouns contained in the string. 
+- `starts_with_num()`: Takes a character string and returns a logical - TRUE if the string begins with a number, and FALSE if it does not. 
+- `has_question_word()`: Takes a character string and returns a logical - TRUE if the string contains a question word, and FALSE if it does not.
+- `positivity()`: Takes a character string and returns the sum of the AFINN positivity scores of the words in the string. 
+
+It's easy to see how these functions might help us determine whether or not an article is clickbait. For example, many clickbait articles appear to begin with numbers, in which case `starts_with_num()` might be useful. 
+
+Using `mutate()`, we can apply each of these functions to the titles in our data sets, and as such create our features. Note that in the case of `positivity`, we have to use `rowwise()` to ensure that we evaluate the positivity of each title individually instead of together. 
+
+```{r feature-creation}
 # CREATE FEATURES ------------------------------------------------------------------------
 
 clickbait_train <- headlines_train |>
@@ -39,11 +79,13 @@ clickbait_train <- headlines_train |>
     #num_stop_words = num_stop_words(title),
     num_words = num_words(title),
     num_pronouns = num_pronouns(title),
-    #positivity = positivity(title),
     starts_num = as.factor(starts_with_num(title)), 
     question = as.factor(has_question_word(title))
   ) |>
-  select(-c(ids, title))
+  rowwise() |>
+  mutate(positivity = positivity(title)) |>
+  select(-c(ids, title)) # remove non feature variables
+  
 
 clickbait_test <- headlines_test |>
   na.omit() |>
@@ -55,32 +97,52 @@ clickbait_test <- headlines_test |>
     #num_stop_words = num_stop_words(title),
     num_words = num_words(title),
     num_pronouns = num_pronouns(title),
-    #positivity = positivity(title),
     starts_num = as.factor(starts_with_num(title)), 
     question = as.factor(has_question_word(title))
   ) |>
-  select(-c(ids, title))
+  rowwise() |>
+  mutate(positivity = positivity(title)) |>
+  select(-c(ids, title)) # remove non feature variables
+```
 
+## Models 
+
+Now that we have our features, we're ready to start modeling. First, we'll look at the accuracy of the null model (which classifies every observation into the most predominant class.)
+
+```{r null-model}
 # NULL MODEL -----------------------------------------------------------------------------
 
 table(clickbait_train$clickbait)
 
 mean(clickbait_train$clickbait == "FALSE")
+mean(clickbait_test$clickbait == "FALSE")
 ```
 
-```{r}
+We can see that the most predominant class appears to be FALSE (not clickbait), and both the training and test accuracy of the model that classifies every observation as not clickbait are around 0.655. 
+ 
+### Logistic Regression
+
+We'll consider a simple, additive logistic regression as our first model. In order to decide which variables to include, we use `stepAIC()` from the `MASS` package to perform backward selection. 
+
+```{r model-selection}
 # MODEL SELECTION ------------------------------------------------------------------------
 
 full_model <- glm(
-  clickbait ~ common + exaggerated + num_contractions + num_words + num_pronouns + 
-    starts_num + question, 
+  clickbait ~ ., 
   data = clickbait_train, 
   family = binomial
   )
 
-MASS::stepAIC(full_model, direction = "backward")
+MASS::stepAIC(full_model, trace = 0)
+```
 
-# LOGISTIC REGRESSION --------------------------------------------------------------------
+The automated selection procedure selects the full model including all features, which we fit below. Notice that we reorder the levels of the factor `clickbait` so that the reference level is "TRUE", and our model 
+
+```{r logistic-fit}
+# MODEL FIT ------------------------------------------------------------------------------
+
+clickbait_train$clickbait <- relevel(clickbait_train$clickbait, ref = "FALSE")
+clickbait_test$clickbait <- relevel(clickbait_test$clickbait, ref = "FALSE")
 
 simple_logistic_model<- logistic_reg() %>%
         set_engine("glm") %>%
@@ -88,52 +150,72 @@ simple_logistic_model<- logistic_reg() %>%
         fit(clickbait ~ ., data = clickbait_train)
 
 tidy(simple_logistic_model)  
+```
 
-# PREDICTION and METRICS -----------------------------------------------------------------
+We can filter the above table to include only the significant terms, as below 
 
-pred_class <- predict(
+```{r}
+tidy(simple_logistic_model) |>
+  filter(p.value < 0.05)
+```
+
+From the above, we can see that all of the features appear significant at a 0.05 level, with the exception of `common` and `question`. 
+
+Now that we've fitted the model, it remains for us to interpret it, and then utilize it for prediction. As it currently stands, the coefficients in the model are in log-odds form. For easier interpretation, we can look at odds ratios by exponentiating these. 
+
+```{r}
+tidy(simple_logistic_model, exponentiate = TRUE)
+```
+
+> ADD INTERPRETATION 
+
+We can now use our trained model to predict clickbait on our test data set. We look at both the predicted class, and the predicted probabilities that an article is clickbait or not. 
+
+```{r logistic-predict}
+# MODEL PREDICTION -----------------------------------------------------------------------
+
+pred_class_logistic <- predict(
   simple_logistic_model, 
   new_data = clickbait_test, 
   type = "class"
 )
 
-pred_prob <- predict(
+pred_prob_logistic <- predict(
   simple_logistic_model, 
   new_data = clickbait_test, 
   type = "prob"
 )
 
-clickbait_results <- clickbait_test |>
+clickbait_results_logistic <- clickbait_test |>
   select(clickbait) |>
-  bind_cols(pred_class, pred_prob)
-
-confusion_matrix <- yardstick::conf_mat(
-  clickbait_results, truth = clickbait, estimate = .pred_class
-  )
-
-confusion_matrix
-
-accuracy <- yardstick::accuracy(
-  clickbait_results, truth = clickbait, estimate = .pred_class
-  )
-
-sensitivity <- yardstick::sens(
-  clickbait_results, truth = clickbait, estimate = .pred_class
-)
-
-specificity <- yardstick::spec(
-  clickbait_results, truth = clickbait, estimate = .pred_class
-)
-
-yardstick::roc_curve(
-  clickbait_results, truth = clickbait, estimate = .pred_TRUE
-) |>
-  autoplot()
+  bind_cols(pred_class_logistic, pred_prob_logistic)
 ```
 
-# Decision Tree 
+Using our results, we can assess the testing accuracy of our model as below. 
 
-```{r}
+```{r logistic-metrics}
+# ASSESSMENT METRICS ---------------------------------------------------------------------
+
+confusion_matrix_logistic <- yardstick::conf_mat(
+  clickbait_results_logistic, truth = clickbait, estimate = .pred_class
+  )
+
+confusion_matrix_logistic
+
+accuracy_logistic <- yardstick::accuracy_vec(
+  truth = clickbait_results_logistic$clickbait, estimate = clickbait_results_logistic$.pred_class
+  )
+
+accuracy_logistic
+```
+
+Our logistic regression model has an accuracy of around 0.806, which is a clear improvement over the null model. 
+
+### Decision Tree 
+
+```{r decision-fit, warning = FALSE, out.width='75%'}
+# MODEL FIT ------------------------------------------------------------------------------
+
 dec_tree <- decision_tree(tree_depth = 10) |>
   set_engine("rpart") |>
   set_mode("classification") |> 
@@ -142,7 +224,9 @@ dec_tree <- decision_tree(tree_depth = 10) |>
 rpart.plot::rpart.plot(dec_tree$fit)
 ```
 
-```{r}
+```{r decision-metrics}
+# ASSESSMENT METRICS ---------------------------------------------------------------------
+
 # training accuracy 
 
 augment(dec_tree, new_data = clickbait_train) |> 
