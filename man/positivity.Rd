@@ -12,7 +12,7 @@ positivity(text)
 \description{
 This function takes in any dataframe with headline and ids variables and
 returns a new dataframe containing the variable positivity,
-which is an integer that represents the total AFINN score associated with
+which an integer that represents the total AFINN score associated with
 each headline. Scores of 0 represent neutral headlines, or headlines
 not containing any words within the AFINN wordbank.
 }
