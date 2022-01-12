@@ -66,7 +66,7 @@ It's easy to see how these functions might help us determine whether or not an a
 
 Using `mutate()`, we can apply each of these functions to the titles in our data sets, and as such create our features. Note that in the case of `positivity`, we have to use `rowwise()` to ensure that we evaluate the positivity of each title individually instead of together. 
 
-```{r feature-creation}
+```{r feature-creation, eval = FALSE}
 # CREATE FEATURES ------------------------------------------------------------------------
 
 clickbait_train <- headlines_train |>
@@ -76,7 +76,7 @@ clickbait_train <- headlines_train |>
     common = as.factor(has_common_phrase(title)),
     exaggerated = as.factor(has_exaggerated_phrase(title)), 
     num_contractions = num_contractions(title),
-    #num_stop_words = num_stop_words(title),
+    num_stop_words = num_stop_words(title),
     num_words = num_words(title),
     num_pronouns = num_pronouns(title),
     starts_num = as.factor(starts_with_num(title)), 
@@ -94,7 +94,7 @@ clickbait_test <- headlines_test |>
     common = as.factor(has_common_phrase(title)),
     exaggerated = as.factor(has_exaggerated_phrase(title)), 
     num_contractions = num_contractions(title),
-    #num_stop_words = num_stop_words(title),
+    num_stop_words = num_stop_words(title),
     num_words = num_words(title),
     num_pronouns = num_pronouns(title),
     starts_num = as.factor(starts_with_num(title)), 
@@ -103,6 +103,19 @@ clickbait_test <- headlines_test |>
   rowwise() |>
   mutate(positivity = positivity(title)) |>
   select(-c(ids, title)) # remove non feature variables
+```
+
+The clickbait data sets with features can also be directly loaded from the `textclassificationexamples` package, as below 
+
+```{r}
+data(clickbait_train)
+data(clickbait_test)
+
+clickbait_train <- clickbait_train |>
+  select(-c(ids, title))
+
+clickbait_test <- clickbait_test |>
+  select(-c(ids, title))
 ```
 
 ## Models 
