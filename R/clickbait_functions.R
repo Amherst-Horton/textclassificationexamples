@@ -100,8 +100,9 @@ num_contractions <- function(text){
 #'
 #' @param text string/ headline
 #'
-#' @importFrom stringr str_count
+#' @import stringr
 #' @importFrom utils data 
+#' @import tidytext
 #'
 #' @examples
 #' \dontrun{
@@ -113,7 +114,14 @@ num_contractions <- function(text){
 
 num_stop_words <- function(text){
   data(stop_words)
-  str_count(text, paste(stop_words$word, collapse = "|"))
+  
+  words <- text |>
+    tolower() |>
+    str_split(pattern = " ") |>
+    unlist()
+  
+  sum(words %in% stop_words$word)
+
 }
 
 #' Starts with Number
