@@ -113,14 +113,13 @@ num_contractions <- function(text){
 #' @export
 
 num_stop_words <- function(text){
-  data(stop_words)
   
   words <- text |>
     tolower() |>
     str_split(pattern = " ") |>
     unlist()
   
-  sum(words %in% stop_words$word)
+  sum(words %in% tidytext::stop_words$word)
 
 }
 

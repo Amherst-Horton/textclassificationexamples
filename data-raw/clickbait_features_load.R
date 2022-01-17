@@ -29,6 +29,7 @@ clickbait_test <- headlines_test |>
     starts_num = as.factor(starts_with_num(title)), 
     question = as.factor(has_question_word(title))
   ) |>
+  rowwise() |>
   mutate(positivity = positivity(title), 
          num_stop_words = num_stop_words(title))
 
