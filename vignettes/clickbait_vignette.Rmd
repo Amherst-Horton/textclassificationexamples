@@ -7,19 +7,17 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = NA
-    )
-```
-
-```{r setup}
+```{r setup, include = FALSE}
 library(tidymodels)
 library(tidyverse)
 library(bestglm)
 library(scales)
 library(textclassificationexamples)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = NA
+    )
 ```
 
 # Clickbait Classification 
@@ -64,7 +62,7 @@ These include:
 
 It's easy to see how these functions might help us determine whether or not an article is clickbait. For example, many clickbait articles appear to begin with numbers, in which case `starts_with_num()` might be useful. 
 
-Using `mutate()`, we can apply each of these functions to the titles in our data sets, and as such create our features. Note that in the case of `positivity`, we have to use `rowwise()` to ensure that we evaluate the positivity of each title individually instead of together. 
+Using `mutate()`, we can apply each of these functions to the titles in our data sets, and as such create our features. Note that in the case of `positivity`, as well as `num_stop_words`, we have to use `rowwise()` to ensure that we evaluate each title individually.
 
 ```{r feature-creation, eval = FALSE}
 # CREATE FEATURES ------------------------------------------------------------------------
@@ -76,14 +74,15 @@ clickbait_train <- headlines_train |>
     common = as.factor(has_common_phrase(title)),
     exaggerated = as.factor(has_exaggerated_phrase(title)), 
     num_contractions = num_contractions(title),
-    num_stop_words = num_stop_words(title),
     num_words = num_words(title),
     num_pronouns = num_pronouns(title),
     starts_num = as.factor(starts_with_num(title)), 
     question = as.factor(has_question_word(title))
   ) |>
   rowwise() |>
-  mutate(positivity = positivity(title)) |>
+  mutate(
+    num_stop_words = num_stop_words(title),
+    positivity = positivity(title)) |>
   select(-c(ids, title)) # remove non feature variables
   
 
@@ -101,7 +100,9 @@ clickbait_test <- headlines_test |>
     question = as.factor(has_question_word(title))
   ) |>
   rowwise() |>
-  mutate(positivity = positivity(title)) |>
+  mutate(
+    num_stop_words = num_stop_words(title),
+    positivity = positivity(title)) |>
   select(-c(ids, title)) # remove non feature variables
 ```
 
@@ -157,6 +158,8 @@ The automated selection procedure selects the full model including all features,
 clickbait_train$clickbait <- relevel(clickbait_train$clickbait, ref = "FALSE")
 clickbait_test$clickbait <- relevel(clickbait_test$clickbait, ref = "FALSE")
 
+set.seed(495)
+
 simple_logistic_model<- logistic_reg() %>%
         set_engine("glm") %>%
         set_mode("classification") %>%
@@ -186,6 +189,8 @@ We can now use our trained model to predict clickbait on our test data set. We l
 
 ```{r logistic-predict}
 # MODEL PREDICTION -----------------------------------------------------------------------
+
+set.seed(495)
 
 pred_class_logistic <- predict(
   simple_logistic_model, 
@@ -222,11 +227,13 @@ accuracy_logistic <- yardstick::accuracy_vec(
 accuracy_logistic
 ```
 
-Our logistic regression model has an accuracy of around 0.806, which is a clear improvement over the null model. 
+Our logistic regression model has an accuracy of around 0.878, which is a clear improvement over the null model. 
 
 ### Decision Tree 
 
-```{r decision-fit, warning = FALSE, out.width='75%'}
+We'll use the same variables as in our logistic regression model to fit a decision tree. In the plot below, the boxes at each node display three values, the first of which is the classification decision (TRUE if an observation is classified as clickbait, and FALSE if it is not). The second value gives the probability of this classification, and the third gives the percentage of observations that fall into this classification at that stage. 
+
+```{r decision-fit, warning = FALSE, fig.align = "center"}
 # MODEL FIT ------------------------------------------------------------------------------
 
 dec_tree <- decision_tree(tree_depth = 10) |>
@@ -236,6 +243,8 @@ dec_tree <- decision_tree(tree_depth = 10) |>
 
 rpart.plot::rpart.plot(dec_tree$fit)
 ```
+
+We can assess the tree by considering the training and test accuracy, which we see are around 0.89 - once more an improvement on the null model, and a slight improvement on the logistic regression model we fit earlier. 
 
 ```{r decision-metrics}
 # ASSESSMENT METRICS ---------------------------------------------------------------------
