@@ -4,6 +4,7 @@ library(tidyverse)
 spam_train <- emails_train |>
   na.omit() |>
   mutate(
+    type = as.factor(ifelse(type %in% c("spam"), "spam", "not_spam")),
     all_caps = as.factor(all_caps(subjectline)), 
     has_dollar_sign = as.factor(has_dollar_sign(subjectline)), 
     has_ampersand = as.factor(has_dollar_sign(subjectline)), 
@@ -18,6 +19,7 @@ spam_train <- emails_train |>
 spam_test <- emails_test |>
   na.omit() |>
   mutate(
+    type = as.factor(ifelse(type %in% c("spam"), "spam", "not_spam")),
     all_caps = as.factor(all_caps(subjectline)), 
     has_dollar_sign = as.factor(has_dollar_sign(subjectline)), 
     has_ampersand = as.factor(has_dollar_sign(subjectline)), 
