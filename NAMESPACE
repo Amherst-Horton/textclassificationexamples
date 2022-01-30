@@ -2,6 +2,9 @@
 
 export("%>%")
 export(all_caps)
+export(begins_re)
+export(ends_with_period)
+export(has_ampersand)
 export(has_common_phrase)
 export(has_dear)
 export(has_dollar_sign)

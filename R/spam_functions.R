@@ -42,6 +42,28 @@ has_dollar_sign <- function(text) {
   str_detect(text, "\\$")
 }
 
+#' Ampersand
+#'
+#' This function takes in any string and returns a boolean indicating
+#' whether or not there is an ampersand. This function is intended for use
+#' on any of the email MEA datasets.
+#'
+#' @param text string/ email subject line
+#'
+#' @importFrom stringr str_detect
+#' 
+#' @examples
+#' \dontrun{
+#' emails_dollar <- emails %>%
+#'    mutate(has_ampersand = has_ampersand(text = subjectline))
+#' }
+#'
+#' @export
+
+has_ampersand <- function(text) {
+  str_detect(text, "\\&")
+}
+
 #' Dear
 #'
 #' This function takes in any string and returns a boolean indicating
@@ -84,6 +106,27 @@ has_dear <- function(text) {
 
 has_mister <- function(text) {
   str_detect(text, "Mr|Mister")
+}
+
+#' Ends with a Period 
+#'
+#' This function takes in any string and returns a boolean indicating
+#' whether or not it ends with a period. This function
+#' is intended for use on any of the email MEA datasets.
+#'
+#' @param text string/ email subject line
+#'
+#' @importFrom stringr str_detect
+#' 
+#' @examples
+#' \dontrun{
+#' emails_mister <- emails %>% ends_with_period(text = subjectline))
+#' }
+#'
+#' @export
+
+ends_with_period <- function(text) {
+  str_detect(text, "\\.$")
 }
 
 #' Multiple Punctuation
@@ -129,4 +172,26 @@ multiple_punctuation <- function(text) {
 
 has_religious <- function(text) {
   str_detect(text, "lord|Lord|god|God|Blessing|blessing")
+}
+
+#' Re:
+#'
+#' This function takes in any string and returns a boolean indicating
+#' whether or not it begins with "Re:", not followed by a space. This function is
+#' intended for use on any of the email MEA datasets.
+#'
+#' @param text string/ email subject line
+#'
+#' @importFrom stringr str_detect
+#' 
+#' @examples
+#' \dontrun{
+#' emails_punctuation <- emails %>%
+#'    mutate(begins_re = begins_re(text = subjectline))
+#' }
+#'
+#' @export
+
+begins_re <- function(text) {
+  str_detect(text, "^(Re:)") & !str_detect(text, "^(Re: )")
 }

@@ -221,3 +221,4 @@ augment(dec_tree, new_data = spam_train) |>
 augment(dec_tree, new_data = spam_test) |> 
   accuracy(truth = type, estimate = .pred_class)
 ```
+
