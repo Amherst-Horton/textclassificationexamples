@@ -14,7 +14,9 @@ spam_train <- emails_train |>
     multiple_punctuation = as.factor(multiple_punctuation(subjectline)), 
     has_religious = as.factor(has_religious(subjectline)), 
     begins_re = as.factor(begins_re(subjectline))
-  ) 
+  ) |>
+  rowwise() |>
+  mutate(positivity = positivity(subjectline))
 
 spam_test <- emails_test |>
   na.omit() |>
@@ -29,7 +31,9 @@ spam_test <- emails_test |>
     multiple_punctuation = as.factor(multiple_punctuation(subjectline)), 
     has_religious = as.factor(has_religious(subjectline)), 
     begins_re = as.factor(begins_re(subjectline))
-  ) 
+  ) |>
+  rowwise() |>
+  mutate(positivity = positivity(subjectline))
 
 usethis::use_data(spam_train, overwrite = TRUE)
 usethis::use_data(spam_test, overwrite = TRUE)
